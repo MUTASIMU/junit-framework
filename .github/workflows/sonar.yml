@@ -10,18 +10,12 @@ jobs:
   sonar:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository
+      - name: Checkout Upstream Code at Tag
         uses: actions/checkout@v4
         with:
+          repository: junit-team/junit5
+          ref: ${{ github.event.inputs.tag }}
           fetch-depth: 0
-
-      - name: Fetch upstream tags
-        run: |
-          git remote add upstream https://github.com/junit-team/junit5.git
-          git fetch upstream --tags --force
-
-      - name: Checkout specific tag
-        run: git checkout tags/${{ github.event.inputs.tag }}
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarqube-scan-action@v6
@@ -35,4 +29,3 @@ jobs:
             -Dsonar.branch.name=${{ github.event.inputs.tag }}
             -Dsonar.sources=.
             -Dsonar.java.binaries=.
-            -Dsonar.exclusions=**/build/**,**/target/**,**/src/test/**
