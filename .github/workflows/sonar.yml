@@ -16,10 +16,12 @@ jobs:
           fetch-depth: 0
 
       - name: Fetch upstream tags
-        run: git fetch --tags --force https://github.com/junit-team/junit-framework.git
+        run: |
+          git remote add upstream https://github.com/junit-team/junit-framework.git
+          git fetch upstream --tags --force
 
       - name: Checkout specific tag
-        run: git checkout ${{ github.event.inputs.tag }}
+        run: git checkout tags/${{ github.event.inputs.tag }} -B scan-${{ github.event.inputs.tag }}
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarqube-scan-action@v6
