@@ -10,14 +10,17 @@ jobs:
   sonar:
     runs-on: ubuntu-latest
     steps:
-      - name: Fetch tags from upstream repository
-        run: git fetch --tags --force https://github.com/junit-team/junit-framework.git
-      
-      - uses: actions/checkout@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.inputs.tag }}
           fetch-depth: 0
-      
+
+      - name: Fetch upstream tags
+        run: git fetch --tags --force https://github.com/junit-team/junit-framework.git
+
+      - name: Checkout specific tag
+        run: git checkout ${{ github.event.inputs.tag }}
+
       - name: SonarCloud Scan
         uses: SonarSource/sonarqube-scan-action@v6
         env:
@@ -28,4 +31,4 @@ jobs:
             -Dsonar.projectKey=MUTASIMU_junit-framework
             -Dsonar.organization=mutasimu
             -Dsonar.branch.name=${{ github.event.inputs.tag }}
-            -Dsonar.sources=. 
+            -Dsonar.sources=.
