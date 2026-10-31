@@ -9,14 +9,13 @@ jobs:
     strategy:
       fail-fast: false 
       matrix:
-        # These tags exist in the official repository
         tag: ["r5.0.0", "r5.1.0", "r5.2.0", "r5.3.0", "r5.4.0", "r5.5.0", "r5.6.0", "r5.7.0", "r5.8.0", "r5.9.0"]
 
     steps:
       - name: Checkout Code for ${{ matrix.tag }}
         uses: actions/checkout@v4
         with:
-          repository: junit-team/junit5  # <-- THIS IS THE FIX
+          repository: junit-team/junit-framework  # <-- CHANGED to the new official name
           ref: ${{ matrix.tag }}
           fetch-depth: 0 
 
