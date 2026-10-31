@@ -9,7 +9,7 @@ jobs:
     strategy:
       fail-fast: false 
       matrix:
-        # Selected 10 stable releases spanning ~3 years (2020 to 2023) compatible with JDK 17
+        # Releases from r5.7.0 to r5.10.0 span ~3 years and are compatible with JDK 11
         tag: ["r5.7.0", "r5.7.1", "r5.7.2", "r5.8.0", "r5.8.1", "r5.8.2", "r5.9.0", "r5.9.1", "r5.9.2", "r5.10.0"]
 
     steps:
@@ -20,15 +20,15 @@ jobs:
           ref: ${{ matrix.tag }}
           fetch-depth: 0 
 
-      - name: Set up JDK 17
+      - name: Set up JDK 11
         uses: actions/setup-java@v4
         with:
-          java-version: 17
+          java-version: 11
           distribution: 'temurin'
 
-      # Assembles production classes while bypassing test execution
+      # The official build command for these versions is clean assemble
       - name: Compile Production Code Only
-        run: ./gradlew assemble -x test
+        run: ./gradlew clean assemble
 
       - name: SonarCloud Scan for ${{ matrix.tag }}
         uses: SonarSource/sonarqube-scan-action@v5
