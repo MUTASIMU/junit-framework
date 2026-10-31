@@ -3,32 +3,29 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Enter the JUnit Tag (e.g., r5.0.0)'
+        description: 'Enter JUnit Tag (e.g., r5.0.0)'
         required: true
 
 jobs:
   sonar:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Upstream Code at Tag
+      - name: Checkout Code
         uses: actions/checkout@v4
         with:
           repository: junit-team/junit5
           ref: ${{ github.event.inputs.tag }}
           fetch-depth: 0
 
-      - name: Download SonarScanner CLI
-        run: |
-          wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip
-          unzip sonar-scanner-cli-5.0.1.3006-linux.zip
-
-      - name: Run SonarScanner directly
-        run: |
-          ./sonar-scanner-5.0.1.3006-linux/bin/sonar-scanner \
-            -Dsonar.projectKey=MUTASIMU_junit-${{ github.event.inputs.tag }} \
-            -Dsonar.organization=mutasimu \
-            -Dsonar.sources=. \
-            -Dsonar.java.binaries=. \
-            -Dsonar.host.url=https://sonarcloud.io \
-            -Dsonar.token=${{ secrets.SONAR_TOKEN }} \
-            -Dsonar.exclusions=**/build/**,**/target/**,**/src/test/**
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarqube-scan-action@v6
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: https://sonarcloud.io
+        with:
+          args: >
+            -Dsonar.projectKey=MUTASIMU_junit-${{ github.event.inputs.tag }}
+            -Dsonar.organization=mutasimu
+            -Dsonar.sources=.
+            -Dsonar.java.binaries=.
+            -Dsonar.exclusions=**/src/test/**,**/build/**
