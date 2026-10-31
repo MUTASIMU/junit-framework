@@ -9,7 +9,8 @@ jobs:
     strategy:
       fail-fast: false 
       matrix:
-        tag: ["r5.0.0", "r5.1.0", "r5.2.0", "r5.3.0", "r5.4.0", "r5.5.0", "r5.6.0", "r5.7.0", "r5.8.0", "r5.9.0"]
+        # Selected 10 stable releases spanning ~3 years (2020 to 2023) compatible with JDK 17
+        tag: ["r5.7.0", "r5.7.1", "r5.7.2", "r5.8.0", "r5.8.1", "r5.8.2", "r5.9.0", "r5.9.1", "r5.9.2", "r5.10.0"]
 
     steps:
       - name: Checkout Code for ${{ matrix.tag }}
@@ -25,8 +26,9 @@ jobs:
           java-version: 17
           distribution: 'temurin'
 
+      # Assembles production classes while bypassing test execution
       - name: Compile Production Code Only
-        run: ./gradlew build -x test
+        run: ./gradlew assemble -x test
 
       - name: SonarCloud Scan for ${{ matrix.tag }}
         uses: SonarSource/sonarqube-scan-action@v5
