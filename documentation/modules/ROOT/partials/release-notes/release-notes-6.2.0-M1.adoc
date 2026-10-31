@@ -82,6 +82,8 @@ repository on GitHub.
   it has already provided now finish before the `@AfterEach` methods and after-each
   callbacks of the factory method are executed. Previously, with parallel execution, these
   could run while the dynamic tests were still executing.
+* `ClassOrderer.Random` and `MethodOrderer.Random` now log the used seed only once per
+  launcher session.
 
 [[v6.2.0-M1-junit-jupiter-deprecations-and-breaking-changes]]
 ==== Deprecations and Breaking Changes
@@ -94,7 +96,10 @@ repository on GitHub.
 * When the timeout provided to `assertTimeout`, `assertTimeoutPreemptively` and test
   methods annotated with `@Timeout` is not a positive value less than 2^63^ nanoseconds
   (approximately 292 years) a `PreconditionViolationException` is thrown.
-
+* `ExtensionContext.Namespace` and `ExtensionContext.Store` have been deprecated
+  in favor of `org.junit.jupiter.api.store.Namespace` and
+  `org.junit.jupiter.api.store.Store`. In most cases, changing the `Namespace`
+  and `Store` imports suffices to migrate.
 [[v6.2.0-M1-junit-jupiter-new-features-and-improvements]]
 ==== New Features and Improvements
 
@@ -107,6 +112,13 @@ repository on GitHub.
 * Jupiter configuration parameters are documented in `META-INF/junit-platform-configuration-metadata.json`
 * The `junit.jupiter.execution.parallel.config.executor-service` configuration parameter
   now defaults to `WORKER_THREAD_POOL` when parallel execution is enabled.
+* Implementations of `ClassOrderer` or `MethodOrderer` may now access the store scoped to
+  the enclosing launcher session via the new `DiscoveryContext.getStore(...)` API.
+  This can be used to store or cache information that is reused during test execution or
+  later discovery phases.
+* New `org.junit.jupiter.api.store` package containing `Store` and `Namespace` interfaces
+  which are now extended by `ExtensionContext.Store` and `ExtensionContext.Namespace`,
+  respectively.
 
 [[v6.2.0-M1-junit-vintage]]
 === JUnit Vintage
