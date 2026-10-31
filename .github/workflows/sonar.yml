@@ -24,11 +24,9 @@ jobs:
           SONAR_HOST_URL: https://sonarcloud.io
         with:
           args: >
-            -Dsonar.projectKey=MUTASIMU_junit-framework
+            -Dsonar.projectKey=MUTASIMU_junit-${{ github.event.inputs.tag }}
             -Dsonar.organization=mutasimu
-            -Dsonar.branch.name=${{ github.event.inputs.tag }}
             -Dsonar.sources=.
             -Dsonar.java.binaries=.
-            -Dsonar.java.test.binaries=.
             -Dsonar.java.source=8
             -Dsonar.exclusions=**/build/**,**/target/**,**/src/test/**,**/documentation/**
