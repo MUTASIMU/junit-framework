@@ -1,31 +1,31 @@
-name: SonarCloud Scan
-on: 
+name: SonarCloud Analysis
+on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
-    inputs:
-      tag:
-        description: 'Enter JUnit Tag (e.g., r5.0.0)'
-        required: true
 
 jobs:
-  sonar:
+  build:
+    name: Build and analyze
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
-          repository: junit-team/junit5
-          ref: ${{ github.event.inputs.tag }}
-          fetch-depth: 0
+          fetch-depth: 0  # Important for SonarCloud to see full history
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: 'temurin'
+
+      # JUnit 5 uses Gradle. This command builds the project, runs tests, and generates the JaCoCo report.
+      - name: Build and test with Gradle
+        run: ./gradlew build jacocoTestReport
 
       - name: SonarCloud Scan
-        uses: SonarSource/sonarqube-scan-action@v6
+        uses: SonarSource/sonarqube-scan-action@v5
         env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: https://sonarcloud.io
-        with:
-          args: >
-            -Dsonar.projectKey=MUTASIMU_junit-${{ github.event.inputs.tag }}
-            -Dsonar.organization=mutasimu
-            -Dsonar.sources=.
-            -Dsonar.java.binaries=.
-            -Dsonar.exclusions=**/src/test/**,**/build/**
