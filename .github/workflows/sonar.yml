@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Enter JUnit Tag (e.g., r5.10.0). Leave blank for default branch.'
+        description: 'Enter JUnit Tag (e.g., r5.0.0). Leave blank for default branch.'
         required: false
 
 jobs:
@@ -17,7 +17,9 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
-          # Uses the tag if provided, otherwise uses the current branch (main)
+          # 1. Point to the official repository so tags are found
+          repository: junit-team/junit-framework
+          # 2. Use the tag if provided, otherwise use the default branch (main)
           ref: ${{ github.event.inputs.tag || github.ref }}
           fetch-depth: 0
 
@@ -27,7 +29,7 @@ jobs:
           java-version: 11
           distribution: 'temurin'
 
-      # REQUIRED: Compile the code so SonarCloud can read the Java binaries
+      # 3. REQUIRED: Compile the Java code before scanning
       - name: Build with Gradle
         run: ./gradlew assemble -x test --no-daemon
 
