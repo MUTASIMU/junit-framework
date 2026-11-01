@@ -1,43 +1,31 @@
-name: JUnit Empirical Study
-
-on:
-  workflow_dispatch: 
+name: SonarCloud Scan
+on: 
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Enter JUnit Tag (e.g., r5.0.0)'
+        required: true
 
 jobs:
-  scan-versions:
+  sonar:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false 
-      matrix:
-        # Releases r5.0.0 to r5.6.3 span 3+ years and build reliably with JDK 11
-        tag: ["r5.0.0", "r5.1.0", "r5.2.0", "r5.3.0", "r5.4.0", "r5.5.0", "r5.6.0", "r5.6.1", "r5.6.2", "r5.6.3"]
-
     steps:
-      - name: Checkout Code for ${{ matrix.tag }}
+      - name: Checkout Code
         uses: actions/checkout@v4
         with:
-          repository: junit-team/junit-framework
-          ref: ${{ matrix.tag }}
-          fetch-depth: 0 
+          repository: junit-team/junit5
+          ref: ${{ github.event.inputs.tag }}
+          fetch-depth: 0
 
-      - name: Set up JDK 11
-        uses: actions/setup-java@v4
-        with:
-          java-version: 11
-          distribution: 'temurin'
-
-      # Avoids daemon lock issues on older Gradle versions
-      - name: Compile Production Code Only
-        run: ./gradlew clean assemble --no-daemon
-
-      - name: SonarCloud Scan for ${{ matrix.tag }}
-        uses: SonarSource/sonarqube-scan-action@v5
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarqube-scan-action@v6
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: https://sonarcloud.io
         with:
           args: >
-            -Dsonar.projectKey=MUTASIMU_junit-${{ matrix.tag }}
+            -Dsonar.projectKey=MUTASIMU_junit-${{ github.event.inputs.tag }}
             -Dsonar.organization=mutasimu
             -Dsonar.sources=.
-            -Dsonar.java.binaries=**/build/classes/java/main
-            -Dsonar.exclusions=**/src/test/**,**/build/**,**/src/integrationTest/**
+            -Dsonar.java.binaries=.
+            -Dsonar.exclusions=**/src/test/**,**/build/**
